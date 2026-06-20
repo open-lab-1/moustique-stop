@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MosquiShield — Le piège à moustiques intelligent</title>
+  <meta name="description" content="MosquiShield élimine les moustiques intelligemment grâce au CO₂, à la chaleur simulée et à une grille électrique sécurisée." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --night: #0A0F1E;
+      --night2: #131b30;
+      --cyan: #00D4FF;
+      --violet: #7B2FFF;
+      --lunar: #F0F4FF;
+      --glass-bg: rgba(255,255,255,0.04);
+      --glass-border: rgba(255,255,255,0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--night);
+      color: var(--lunar);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--night); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius: 3px; }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #00D4FF 0%, #7B2FFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #00D4FF 0%, #7B2FFF 100%);
+      color: white;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    .section-pad { padding: 80px 0; }
+    @media(min-width:768px){ .section-pad { padding: 110px 0; } }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* Fade-in on scroll */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── NAVBAR ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 20px 0;
+      transition: all 0.3s ease;
+    }
+    nav.scrolled {
+      background: rgba(10,15,30,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 12px 0;
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1200px; margin: 0 auto; padding: 0 24px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: linear-gradient(135deg, #00D4FF, #7B2FFF);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .nav-logo span { font-family: 'Space Grotesk',sans-serif; font-weight: 700; font-size: 18px; color: var(--lunar); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { color: rgba(240,244,255,0.65); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--cyan); }
+    .nav-cta { padding: 10px 22px; border-radius: 50px; font-size: 14px; }
+    .nav-burger { display: none; background: none; border: none; cursor: pointer; color: var(--lunar); font-size: 24px; }
+    .mobile-menu {
+      display: none; position: fixed; top: 60px; left: 0; right: 0;
+      background: rgba(10,15,30,0.97); padding: 20px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 99;
+      flex-direction: column; gap: 16px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { color: rgba(240,244,255,0.7); text-decoration: none; font-size: 16px; font-weight: 500; padding: 8px 0; }
+    @media(max-width:767px){
+      .nav-links,.nav-cta { display: none; }
+      .nav-burger { display: block; }
+    }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+      background: var(--night);
+      padding-top: 80px;
+    }
+    .hero-glow1 {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 500px;
+      background: radial-gradient(ellipse, rgba(0,212,255,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-glow2 {
+      position: absolute; top: 30%; right: -10%;
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(123,47,255,0.15) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      position: absolute; inset: 0; opacity: 0.035;
+      background-image: linear-gradient(rgba(0,212,255,1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,1) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+    .hero-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 60px; position: relative; z-index: 2;
+    }
+    .hero-text { flex: 1; max-width: 600px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 50px;
+      border: 1px solid rgba(0,212,255,0.25);
+      background: rgba(0,212,255,0.06);
+      font-size: 12px; font-weight: 600; color: var(--cyan);
+      margin-bottom: 28px; letter-spacing: 0.02em;
+    }
+    .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hero-title { font-size: clamp(40px, 6vw, 68px); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 24px; }
+    .hero-sub { font-size: clamp(16px,2vw,19px); color: rgba(240,244,255,0.55); line-height: 1.7; margin-bottom: 36px; max-width: 500px; }
+    .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 52px; }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(240,244,255,0.7); font-weight: 600; font-size: 15px;
+      text-decoration: none; transition: all 0.2s;
+      font-family: 'Space Grotesk',sans-serif;
+    }
+    .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
+    .hero-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+    .hero-stat { display: flex; flex-direction: column; }
+    .hero-stat strong { font-family: 'Space Grotesk',sans-serif; font-size: 26px; font-weight: 700; color: var(--cyan); }
+    .hero-stat span { font-size: 12px; color: rgba(240,244,255,0.4); margin-top: 2px; }
+    .stat-divider { width: 1px; background: rgba(255,255,255,0.1); align-self: stretch; }
+
+    /* Product illustration */
+    .hero-visual { flex: 0 0 380px; display: flex; justify-content: center; align-items: center; }
+    @media(max-width:900px){ .hero-visual { display: none; } }
+    .product-wrap { position: relative; width: 280px; height: 360px; display: flex; align-items: center; justify-content: center; animation: float 5s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+    .ring {
+      position: absolute; border-radius: 50%;
+      border: 1px solid rgba(0,212,255,0.2);
+      animation: expand 3s ease-out infinite;
+    }
+    .ring:nth-child(1){ width:120px;height:120px;animation-delay:0s; }
+    .ring:nth-child(2){ width:200px;height:200px;animation-delay:0.9s; }
+    .ring:nth-child(3){ width:290px;height:290px;animation-delay:1.8s; }
+    @keyframes expand { 0%{transform:scale(1);opacity:0.6} 100%{transform:scale(1.5);opacity:0} }
+    .device { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
+    .device-top {
+      width: 90px; height: 18px; border-radius: 50px 50px 0 0;
+      background: linear-gradient(180deg, #2a3a5c 0%, #1a2540 100%);
+      box-shadow: 0 -2px 12px rgba(0,212,255,0.25);
+    }
+    .device-body {
+      width: 90px; height: 180px;
+      background: linear-gradient(160deg, #1e2d4a 0%, #0f1a30 60%, #0a1020 100%);
+      box-shadow: 0 0 40px rgba(0,212,255,0.15), inset 0 0 20px rgba(0,0,0,0.5), 4px 0 14px rgba(0,0,0,0.3);
+      border-left: 1px solid rgba(255,255,255,0.07);
+      display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+      padding: 14px 0; position: relative; overflow: hidden;
+    }
+    .device-led { width: 70px; height: 3px; border-radius: 2px; background: var(--cyan); box-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan); animation: pulse-led 2s ease-in-out infinite; }
+    @keyframes pulse-led { 0%,100%{opacity:0.5} 50%{opacity:1} }
+    .device-logo { display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .device-logo-circle { width:28px;height:28px;border-radius:50%;border:1px solid rgba(0,212,255,0.4);display:flex;align-items:center;justify-content:center; }
+    .device-logo-dot { width:10px;height:10px;border-radius:50%;background:rgba(0,212,255,0.6); }
+    .device-logo-text { font-size:6px; color:rgba(0,212,255,0.5); letter-spacing:2px; font-family:'Space Grotesk',sans-serif; font-weight:700; }
+    .device-port { width:28px;height:7px;border-radius:4px;background:#080d1a;border:1px solid rgba(255,255,255,0.1); }
+    .device-mesh {
+      position:absolute;inset:0;opacity:0.08;
+      background: repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,212,255,0.4) 3px,rgba(0,212,255,0.4) 4px);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.5) 60%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.5) 60%, transparent 100%);
+    }
+    .device-bottom {
+      width:90px;height:18px;border-radius:0 0 50px 50px;
+      background: linear-gradient(180deg,#1a2540 0%,#0f1825 100%);
+      box-shadow:0 6px 16px rgba(0,0,0,0.5);
+    }
+    .device-shadow { width:60px;height:10px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,212,255,0.35) 0%,transparent 70%);filter:blur(4px);margin-top:10px;opacity:0.5; }
+    .glow-bg1 { position:absolute;width:150px;height:150px;border-radius:50%;background:rgba(0,212,255,0.08);filter:blur(30px); }
+    .glow-bg2 { position:absolute;width:100px;height:100px;border-radius:50%;background:rgba(123,47,255,0.15);filter:blur(20px); }
+
+    /* ─── SECTION HEADER ─── */
+    .section-header { text-align:center; margin-bottom:60px; }
+    .eyebrow { font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(0,212,255,0.7);margin-bottom:14px;display:block; }
+    .section-title { font-size:clamp(30px,4vw,46px);font-weight:700;line-height:1.15;margin-bottom:16px; }
+    .section-sub { font-size:17px;color:rgba(240,244,255,0.5);max-width:560px;margin:0 auto;line-height:1.7; }
+
+    /* ─── PROBLEM ─── */
+    #problem { background:var(--night); }
+    .problem-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px; }
+    .problem-card {
+      border-radius:20px;padding:28px;
+      border:1px solid rgba(255,255,255,0.07);
+      background:rgba(255,255,255,0.03);
+      transition:transform 0.3s,border-color 0.3s;
+    }
+    .problem-card:hover { transform:translateY(-4px);border-color:rgba(255,255,255,0.12); }
+    .problem-icon { width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px; }
+    .problem-stat { font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;margin-bottom:2px; }
+    .problem-stat-label { font-size:11px;color:rgba(240,244,255,0.35);margin-bottom:12px; }
+    .problem-card h3 { font-size:17px;font-weight:600;margin-bottom:8px; }
+    .problem-card p { font-size:13px;color:rgba(240,244,255,0.5);line-height:1.65; }
+
+    /* ─── SOLUTION ─── */
+    #solution { background:var(--night2); }
+    .steps-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:24px;position:relative; }
+    .step-card { display:flex;flex-direction:column;align-items:center;text-align:center; }
+    .step-icon {
+      width:100px;height:100px;border-radius:20px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+      margin-bottom:16px;transition:transform 0.3s;
+    }
+    .step-card:hover .step-icon { transform:translateY(-6px); }
+    .step-icon-emoji { font-size:32px; }
+    .step-num { font-size:10px;font-weight:700;letter-spacing:2px;opacity:0.5;font-family:'Space Grotesk',sans-serif; }
+    .step-card h3 { font-size:15px;font-weight:600;margin-bottom:8px; }
+    .step-card p { font-size:12px;color:rgba(240,244,255,0.45);line-height:1.6; }
+
+    /* ─── FEATURES ─── */
+    #features { background:var(--night); }
+    .features-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px; }
+    .feature-card {
+      border-radius:20px;padding:28px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.07);
+      transition:transform 0.3s,border-color 0.3s;
+    }
+    .feature-card:hover { transform:translateY(-4px);border-color:rgba(255,255,255,0.13); }
+    .feature-top { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px; }
+    .feature-icon { width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px; }
+    .feature-tag { font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px; }
+    .feature-card h3 { font-size:17px;font-weight:600;margin-bottom:8px; }
+    .feature-card p { font-size:13px;color:rgba(240,244,255,0.5);line-height:1.65; }
+
+    /* ─── APP ─── */
+    #app { background:var(--night2); }
+    .app-inner { display:flex;align-items:center;gap:70px;flex-wrap:wrap; }
+    .app-text { flex:1;min-width:280px; }
+    .app-text h2 { font-size:clamp(28px,3.5vw,42px);font-weight:700;margin-bottom:20px;line-height:1.2; }
+    .app-text p { font-size:16px;color:rgba(240,244,255,0.5);line-height:1.75;margin-bottom:32px; }
+    .app-features { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px; }
+    .app-feat { display:flex;align-items:flex-start;gap:12px; }
+    .app-feat-icon { width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(0,212,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:2px; }
+    .app-feat strong { font-size:13px;font-weight:600;display:block;margin-bottom:2px; }
+    .app-feat span { font-size:12px;color:rgba(240,244,255,0.4); }
+    .app-stores { display:flex;gap:12px;flex-wrap:wrap; }
+    .store-btn { display:flex;align-items:center;gap:10px;padding:10px 18px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);font-size:14px;font-weight:500;color:rgba(240,244,255,0.65);cursor:pointer;transition:all 0.2s;text-decoration:none; }
+    .store-btn:hover { border-color:rgba(0,212,255,0.3);color:var(--cyan); }
+    .app-visual { flex:0 0 260px;display:flex;justify-content:center; }
+    @media(max-width:700px){ .app-visual{display:none;} .app-features{grid-template-columns:1fr;} }
+
+    /* Phone mockup */
+    .phone { animation:float 5s ease-in-out infinite;position:relative; }
+    .phone-frame {
+      width:230px;border-radius:36px;padding:3px;
+      background:linear-gradient(135deg,#2a3a5c 0%,#0f1825 100%);
+      box-shadow:0 40px 80px rgba(0,0,0,0.6),0 0 40px rgba(0,212,255,0.08);
+    }
+    .phone-screen { background:#080d1a;border-radius:33px;overflow:hidden; }
+    .phone-notch { display:flex;justify-content:center;padding:10px 0 0; }
+    .phone-notch-inner { width:70px;height:18px;background:#0A0F1E;border-radius:20px; }
+    .phone-content { padding:12px 14px 20px; }
+    .phone-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px; }
+    .phone-header-text small { font-size:9px;color:rgba(240,244,255,0.35); }
+    .phone-header-text strong { font-size:13px;font-weight:700;display:block; }
+    .phone-avatar { width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#00D4FF,#7B2FFF);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white; }
+    .phone-card {
+      border-radius:16px;padding:14px;margin-bottom:10px;
+      background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(123,47,255,0.12));
+      border:1px solid rgba(0,212,255,0.18);
+    }
+    .phone-card small { font-size:8px;color:rgba(0,212,255,0.65);letter-spacing:1px;display:block;margin-bottom:4px; }
+    .phone-card strong { font-size:30px;font-weight:700;font-family:'Space Grotesk',sans-serif;display:block;margin-bottom:2px; }
+    .phone-card span { font-size:8px;color:rgba(240,244,255,0.45); }
+    .phone-card .trend { font-size:8px;color:#4ade80;display:flex;align-items:center;gap:3px;margin-top:6px; }
+    .phone-chart { background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:10px;margin-bottom:10px; }
+    .phone-chart small { font-size:8px;color:rgba(240,244,255,0.35);display:block;margin-bottom:8px; }
+    .chart-bars { display:flex;align-items:flex-end;gap:3px;height:36px; }
+    .chart-bar { flex:1;border-radius:2px;transition:height 0.3s; }
+    .phone-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px; }
+    .phone-mini { background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:8px;text-align:center; }
+    .phone-mini small { font-size:8px;color:rgba(240,244,255,0.35);display:block;margin-bottom:4px; }
+    .phone-mini strong { font-size:14px;font-weight:700;font-family:'Space Grotesk',sans-serif; }
+
+    /* ─── COMPARISON ─── */
+    #comparison { background:var(--night); }
+    .comparison-wrap { overflow-x:auto; }
+    .comparison-table { width:100%;min-width:500px;border-collapse:collapse; }
+    .comparison-table th { padding:12px 16px;text-align:center;font-size:13px; }
+    .comparison-table th:first-child { text-align:left; }
+    .th-product { display:inline-flex;flex-direction:column;align-items:center;gap:4px;padding:8px 12px;border-radius:14px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px; }
+    .th-product.highlight { background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(123,47,255,0.15));border:1px solid rgba(0,212,255,0.25);color:var(--cyan); }
+    .th-product:not(.highlight) { color:rgba(240,244,255,0.45); }
+    .comparison-table td { padding:12px 16px;text-align:center;font-size:13px;border-top:1px solid rgba(255,255,255,0.05); }
+    .comparison-table td:first-child { text-align:left;color:rgba(240,244,255,0.6); }
+    .comparison-table tr:nth-child(even) td { background:rgba(255,255,255,0.01); }
+    .check { display:inline-flex;width:24px;height:24px;border-radius:50%;background:rgba(74,222,128,0.12);align-items:center;justify-content:center;color:#4ade80;font-size:13px; }
+    .cross { display:inline-flex;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.04);align-items:center;justify-content:center;color:rgba(240,244,255,0.2);font-size:13px; }
+
+    /* ─── FAQ ─── */
+    #faq { background:var(--night2); }
+    .faq-grid { display:grid;grid-template-columns:1fr 1fr;gap:14px; }
+    @media(max-width:768px){ .faq-grid{grid-template-columns:1fr;} }
+    .faq-item { border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.03); }
+    .faq-question {
+      width:100%;display:flex;align-items:center;justify-content:space-between;
+      padding:18px 22px;background:none;border:none;cursor:pointer;
+      text-align:left;gap:16px;color:var(--lunar);
+    }
+    .faq-question span { font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px; }
+    .faq-icon { width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;color:rgba(240,244,255,0.5);transition:all 0.3s; }
+    .faq-item.open .faq-icon { background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.3);color:var(--cyan);transform:rotate(45deg); }
+    .faq-answer { max-height:0;overflow:hidden;transition:max-height 0.4s ease,padding 0.3s; }
+    .faq-item.open .faq-answer { max-height:300px; }
+    .faq-answer p { padding:0 22px 18px;font-size:13px;color:rgba(240,244,255,0.5);line-height:1.7;border-top:1px solid rgba(255,255,255,0.05);padding-top:14px; }
+
+    /* ─── PREORDER ─── */
+    #preorder {
+      background:var(--night);
+      position:relative;overflow:hidden;
+    }
+    .preorder-glow {
+      position:absolute;inset:0;pointer-events:none;
+      background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(0,212,255,0.06) 0%,rgba(123,47,255,0.04) 50%,transparent 70%);
+    }
+    .preorder-inner { text-align:center;position:relative;z-index:2; }
+    .preorder-inner h2 { font-size:clamp(28px,4vw,46px);font-weight:700;margin-bottom:16px;line-height:1.2; }
+    .preorder-inner p { font-size:17px;color:rgba(240,244,255,0.5);margin-bottom:44px;max-width:520px;margin-left:auto;margin-right:auto; }
+    .perks-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:44px; }
+    .perk-card { border-radius:18px;padding:20px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center; }
+    .perk-icon { width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(123,47,255,0.15));border:1px solid rgba(0,212,255,0.2);display:flex;align-items:center;justify-content:center;font-size:18px; }
+    .perk-card strong { font-size:13px;font-weight:600; }
+    .perk-card span { font-size:11px;color:rgba(240,244,255,0.35); }
+    .email-form { display:flex;gap:12px;max-width:500px;margin:0 auto 16px;flex-wrap:wrap; }
+    .email-input {
+      flex:1;min-width:200px;padding:14px 22px;border-radius:50px;
+      background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+      color:var(--lunar);font-size:14px;outline:none;transition:border-color 0.2s;
+      font-family:'Inter',sans-serif;
+    }
+    .email-input::placeholder { color:rgba(240,244,255,0.3); }
+    .email-input:focus { border-color:rgba(0,212,255,0.4); }
+    .submit-btn { padding:14px 28px;border-radius:50px;font-size:14px; }
+    .privacy { font-size:12px;color:rgba(240,244,255,0.28);margin-top:12px; }
+    .social-proof { display:flex;align-items:center;justify-content:center;gap:12px;margin-top:36px; }
+    .avatars { display:flex; }
+    .avatar { width:32px;height:32px;border-radius:50%;border:2px solid var(--night);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-left:-8px; }
+    .avatars .avatar:first-child { margin-left:0; }
+    .social-proof span { font-size:14px;color:rgba(240,244,255,0.5); }
+    .social-proof strong { color:var(--cyan); }
+    .success-msg { display:none;flex-direction:column;align-items:center;gap:16px;padding:24px 0; }
+    .success-icon { width:64px;height:64px;border-radius:50%;background:rgba(74,222,128,0.12);display:flex;align-items:center;justify-content:center;font-size:28px; }
+    .success-msg strong { font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700; }
+    .success-msg p { color:rgba(240,244,255,0.5);font-size:14px; }
+
+    /* ─── FOOTER ─── */
+    footer { background:var(--night);border-top:1px solid rgba(255,255,255,0.06); }
+    .footer-inner { padding:60px 0 32px; }
+    .footer-top { display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:40px;margin-bottom:50px; }
+    @media(max-width:900px){ .footer-top{grid-template-columns:1fr 1fr;} }
+    @media(max-width:500px){ .footer-top{grid-template-columns:1fr;} }
+    .footer-brand { }
+    .footer-logo { display:flex;align-items:center;gap:10px;margin-bottom:14px;text-decoration:none; }
+    .footer-logo span { font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;color:var(--lunar); }
+    .footer-brand p { font-size:13px;color:rgba(240,244,255,0.4);line-height:1.65;margin-bottom:20px; }
+    .social-links { display:flex;gap:10px; }
+    .social-link { width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:rgba(240,244,255,0.5);text-decoration:none;transition:all 0.2s; }
+    .social-link:hover { border-color:rgba(0,212,255,0.3);color:var(--cyan); }
+    .footer-col h4 { font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(240,244,255,0.28);margin-bottom:16px; }
+    .footer-col ul { list-style:none; }
+    .footer-col li { margin-bottom:10px; }
+    .footer-col a { font-size:13px;color:rgba(240,244,255,0.5);text-decoration:none;transition:color 0.2s; }
+    .footer-col a:hover { color:var(--cyan); }
+    .footer-bottom { border-top:1px solid rgba(255,255,255,0.05);padding-top:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px; }
+    .footer-bottom span { font-size:12px;color:rgba(240,244,255,0.22); }
+
+    /* Responsive tweaks */
+    @media(max-width:768px){
+      .hero-inner { flex-direction:column; text-align:center; }
+      .hero-sub,.hero-btns { margin-left:auto;margin-right:auto; }
+      .hero-btns { justify-content:center; }
+      .hero-stats { justify-content:center; }
+      .app-inner { flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAVBAR ─── -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-icon">🛡️</div>
+      <span>Mosqui<span class="gradient-text">Shield</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#problem">Problème</a></li>
+      <li><a href="#solution">Solution</a></li>
+      <li><a href="#features">Fonctionnalités</a></li>
+      <li><a href="#app">Application</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a href="#preorder" class="btn-primary nav-cta" style="border-radius:50px;padding:10px 22px;font-size:14px;">Rejoindre la liste</a>
+    <button class="nav-burger" onclick="toggleMenu()" aria-label="Menu">☰</button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#problem" onclick="closeMenu()">Problème</a>
+  <a href="#solution" onclick="closeMenu()">Solution</a>
+  <a href="#features" onclick="closeMenu()">Fonctionnalités</a>
+  <a href="#app" onclick="closeMenu()">Application</a>
+  <a href="#faq" onclick="closeMenu()">FAQ</a>
+  <a href="#preorder" onclick="closeMenu()" style="background:linear-gradient(135deg,#00D4FF,#7B2FFF);color:white;padding:12px 20px;border-radius:50px;text-align:center;font-weight:700;">Rejoindre la liste d'attente</a>
+</div>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <div class="hero-glow1"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-grid"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-badge"><span></span> Technologie brevetée · Lancement 2025</div>
+        <h1 class="hero-title">Dormez enfin <span class="gradient-text">sans moustiques.</span></h1>
+        <p class="hero-sub">MosquiShield attire, capture et élimine automatiquement les moustiques grâce à une technologie CO₂ de pointe. Suivi intelligent en temps réel via votre smartphone.</p>
+        <div class="hero-btns">
+          <a href="#preorder" class="btn-primary" style="padding:14px 30px;border-radius:50px;font-size:15px;">Rejoindre la liste d'attente</a>
+          <a href="#solution" class="btn-outline">Découvrir le produit ↓</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><strong>12 000+</strong><span>inscrits sur liste d'attente</span></div>
+          <div class="stat-divider"></div>
+          <div class="hero-stat"><strong>99.7%</strong><span>taux de capture</span></div>
+          <div class="stat-divider"></div>
+          <div class="hero-stat"><strong>0 dB</strong><span>bruit émis</span></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="product-wrap">
+          <div class="glow-bg1"></div>
+          <div class="glow-bg2"></div>
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="device">
+            <div class="device-top"></div>
+            <div class="device-body">
+              <div class="device-led"></div>
+              <div class="device-logo">
+                <div class="device-logo-circle"><div class="device-logo-dot"></div></div>
+                <div class="device-logo-text">MSHIELD</div>
+              </div>
+              <div class="device-port"></div>
+              <div class="device-mesh"></div>
+            </div>
+            <div class="device-bottom"></div>
+            <div class="device-shadow"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PROBLEM ─── -->
+<section id="problem" class="section-pad">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">Le problème</span>
+      <h2 class="section-title">Les moustiques coûtent cher <span class="gradient-text">à votre santé</span></h2>
+      <p class="section-sub">Bien plus qu'une nuisance estivale, les moustiques représentent une menace croissante que les solutions classiques ne parviennent plus à contenir.</p>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card reveal" style="--delay:0.05s">
+        <div class="problem-icon" style="background:rgba(0,212,255,0.1);">🌙</div>
+        <div class="problem-stat" style="color:#00D4FF;">65%</div>
+        <div class="problem-stat-label">des Français souffrent de nuits perturbées</div>
+        <h3>Nuits gâchées</h3>
+        <p>Un seul moustique suffit à ruiner une nuit entière. Les bourdonnements et les piqûres perturbent le sommeil de millions de personnes chaque été.</p>
+      </div>
+      <div class="problem-card reveal" style="--delay:0.1s">
+        <div class="problem-icon" style="background:rgba(255,78,106,0.1);">❤️</div>
+        <div class="problem-stat" style="color:#FF4E6A;">700 000</div>
+        <div class="problem-stat-label">décès/an liés aux maladies véhiculées</div>
+        <h3>Risques sanitaires</h3>
+        <p>Les moustiques vecteurs de dengue, paludisme et Zika représentent une menace sanitaire en expansion avec le réchauffement climatique.</p>
+      </div>
+      <div class="problem-card reveal" style="--delay:0.15s">
+        <div class="problem-icon" style="background:rgba(255,184,0,0.1);">⚠️</div>
+        <div class="problem-stat" style="color:#FFB800;">90%</div>
+        <div class="problem-stat-label">des utilisateurs insatisfaits des solutions actuelles</div>
+        <h3>Solutions inefficaces</h3>
+        <p>Spirales toxiques, sprays chimiques, raquettes rudimentaires : les solutions actuelles sont soit dangereuses, soit peu pratiques, soit inefficaces.</p>
+      </div>
+      <div class="problem-card reveal" style="--delay:0.2s">
+        <div class="problem-icon" style="background:rgba(123,47,255,0.1);">🌍</div>
+        <div class="problem-stat" style="color:#7B2FFF;">+70</div>
+        <div class="problem-stat-label">départements touchés par le moustique tigre</div>
+        <h3>Expansion des espèces</h3>
+        <p>Le moustique tigre colonise de nouveaux territoires chaque année. Il pique en plein jour et résiste aux répulsifs classiques.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SOLUTION ─── -->
+<section id="solution" class="section-pad" style="background:var(--night2)">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">Comment ça marche</span>
+      <h2 class="section-title">Cinq étapes vers <span class="gradient-text">zéro moustique</span></h2>
+      <p class="section-sub">Un cycle de capture entièrement automatisé, sans intervention de votre part. Posez MosquiShield, allumez et oubliez-le.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card reveal">
+        <div class="step-icon" style="background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(0,212,255,0.05));border:1px solid rgba(0,212,255,0.25);">
+          <div class="step-icon-emoji">💨</div>
+          <div class="step-num">01</div>
+        </div>
+        <h3>Attraction CO₂</h3>
+        <p>Diffusion de CO₂ imitant la respiration humaine. Les moustiques perçoivent ce signal jusqu'à 10 mètres et s'approchent naturellement.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-icon" style="background:linear-gradient(135deg,rgba(255,140,66,0.15),rgba(255,140,66,0.05));border:1px solid rgba(255,140,66,0.25);">
+          <div class="step-icon-emoji">🌡️</div>
+          <div class="step-num">02</div>
+        </div>
+        <h3>Simulation thermique</h3>
+        <p>Surface chauffée à 37°C reproduisant la chaleur corporelle. Combinée au CO₂, cette double simulation rend le piège irrésistible.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-icon" style="background:linear-gradient(135deg,rgba(123,47,255,0.15),rgba(123,47,255,0.05));border:1px solid rgba(123,47,255,0.25);">
+          <div class="step-icon-emoji">🎯</div>
+          <div class="step-num">03</div>
+        </div>
+        <h3>Aspiration douce</h3>
+        <p>Un micro-ventilateur silencieux crée un courant d'air qui aspire les moustiques dans la chambre de capture. Zéro produit chimique.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-icon" style="background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,215,0,0.05));border:1px solid rgba(255,215,0,0.25);">
+          <div class="step-icon-emoji">⚡</div>
+          <div class="step-num">04</div>
+        </div>
+        <h3>Élimination auto</h3>
+        <p>Grille électrique haute tension à sécurité intégrée. Certifiée CE, sans danger pour les enfants et les animaux domestiques.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-icon" style="background:linear-gradient(135deg,rgba(0,255,136,0.15),rgba(0,255,136,0.05));border:1px solid rgba(0,255,136,0.25);">
+          <div class="step-icon-emoji">📊</div>
+          <div class="step-num">05</div>
+        </div>
+        <h3>Comptage intelligent</h3>
+        <p>Capteurs optiques comptant chaque moustique capturé. Données transmises en temps réel via Bluetooth 5.0 sur votre application.</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:50px;" class="reveal">
+      <a href="#preorder" class="btn-primary" style="padding:16px 36px;border-radius:50px;font-size:16px;">Je veux le mien — Précommander</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURES ─── -->
+<section id="features" class="section-pad">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">Fonctionnalités</span>
+      <h2 class="section-title">Technologie de pointe, <span class="gradient-text">design épuré</span></h2>
+      <p class="section-sub">Chaque fonctionnalité de MosquiShield a été pensée pour offrir la meilleure expérience sans compromis.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-top">
+          <div class="feature-icon" style="background:rgba(0,212,255,0.1);">💨</div>
+          <span class="feature-tag" style="background:rgba(0,212,255,0.1);color:#00D4FF;">Attraction</span>
+        </div>
+        <h3>CO₂ intelligent</h3>
+        <p>Diffusion calibrée de CO₂ imitant la respiration humaine. Portée 10 m². Cartouches rechargeables, autonomie 90 jours.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-top">
+          <div class="feature-icon" style="background:rgba(255,140,66,0.1);">🌡️</div>
+          <span class="feature-tag" style="background:rgba(255,140,66,0.1);color:#FF8C42;">Leurre</span>
+        </div>
+        <h3>Chaleur simulée</h3>
+        <p>Surface thermique régulée à 34–37°C. Consommation ultra-faible grâce à un régulateur PID de précision.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-top">
+          <div class="feature-icon" style="background:rgba(255,215,0,0.1);">⚡</div>
+          <span class="feature-tag" style="background:rgba(255,215,0,0.1);color:#FFD700;">Élimination</span>
+        </div>
+        <h3>Grille sécurisée</h3>
+        <p>Double cage de sécurité certifiée CE. Décharge contrôlée, inaccessible aux doigts. Nettoyage par simple brossage.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-top">
+          <div class="feature-icon" style="background:rgba(0,255,136,0.1);">📊</div>
+          <span class="feature-tag" style="background:rgba(0,255,136,0.1);color:#00FF88;">Intelligence</span>
+        </div>
+        <h3>Stats en temps réel</h3>
+        <p>Capteurs optiques infrarouges. Visualisez vos données d'infestation par heure, jour ou semaine sur l'app.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-top">
+          <div class="feature-icon" style="background:rgba(123,47,255,0.1);">🔋</div>
+          <span class="feature-tag" style="background:rgba(123,47,255,0.1);color:#7B2FFF;">Autonomie</span>
+        </div>
+        <h3>Batterie USB-C</h3>
+        <p>Li-ion 5000 mAh — 72h d'autonomie en continu. Charge rapide 18W via USB-C. Indicateur LED 4 niveaux.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-top">
+          <div class="feature-icon" style="background:rgba(255,78,106,0.1);">📱</div>
+          <span class="feature-tag" style="background:rgba(255,78,106,0.1);color:#FF4E6A;">Connectivité</span>
+        </div>
+        <h3>Application mobile</h3>
+        <p>iOS & Android gratuit. Configuration, statistiques, alertes de recharge. Connexion Bluetooth 5.0 instantanée.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── APP ─── -->
+<section id="app" class="section-pad" style="background:var(--night2)">
+  <div class="container">
+    <div class="app-inner">
+      <div class="app-text reveal">
+        <span class="eyebrow">Application mobile</span>
+        <h2>Votre borne connectée, <span class="gradient-text">dans votre poche</span></h2>
+        <p>L'application MosquiShield vous donne une visibilité totale. Combien de moustiques capturés cette nuit ? Quel est le pic d'activité dans votre jardin ? Toutes les réponses en un coup d'œil.</p>
+        <div class="app-features">
+          <div class="app-feat"><div class="app-feat-icon">📈</div><div><strong>Statistiques détaillées</strong><span>Graphiques par heure, jour et semaine</span></div></div>
+          <div class="app-feat"><div class="app-feat-icon">🔔</div><div><strong>Alertes intelligentes</strong><span>Notification quand la trappe est pleine</span></div></div>
+          <div class="app-feat"><div class="app-feat-icon">📅</div><div><strong>Historique complet</strong><span>Journal d'activité sur 12 mois</span></div></div>
+          <div class="app-feat"><div class="app-feat-icon">📡</div><div><strong>Bluetooth 5.0</strong><span>Appairage instantané et stable</span></div></div>
+        </div>
+        <div class="app-stores">
+          <a href="#" class="store-btn"><span>🍎</span> App Store</a>
+          <a href="#" class="store-btn"><span>🤖</span> Google Play</a>
+        </div>
+      </div>
+      <div class="app-visual reveal">
+        <div class="phone">
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="phone-notch"><div class="phone-notch-inner"></div></div>
+              <div class="phone-content">
+                <div class="phone-header">
+                  <div class="phone-header-text"><small>Bonne nuit,</small><strong>Thomas 👋</strong></div>
+                  <div class="phone-avatar">MS</div>
+                </div>
+                <div class="phone-card">
+                  <small>CETTE NUIT</small>
+                  <strong>247</strong>
+                  <span>moustiques capturés</span>
+                  <div class="trend">📈 +12% vs hier</div>
+                </div>
+                <div class="phone-chart">
+                  <small>Activité 24h</small>
+                  <div class="chart-bars" id="chartBars"></div>
+                </div>
+                <div class="phone-grid">
+                  <div class="phone-mini"><small>Batterie</small><strong style="color:#4ade80;">87%</strong></div>
+                  <div class="phone-mini"><small>CO₂</small><strong style="color:#00D4FF;">OK</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── COMPARISON ─── -->
+<section id="comparison" class="section-pad">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">Comparaison</span>
+      <h2 class="section-title">Pourquoi MosquiShield <span class="gradient-text">n'a pas de rival</span></h2>
+      <p class="section-sub">Les solutions existantes font des compromis. MosquiShield les surpasse toutes sur chaque critère.</p>
+    </div>
+    <div class="comparison-wrap reveal">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Critère</th>
+            <th><div class="th-product">🌀<span>Spirale</span></div></th>
+            <th><div class="th-product">💨<span>Spray</span></div></th>
+            <th><div class="th-product">⚡<span>Raquette</span></div></th>
+            <th><div class="th-product highlight">🛡️<span>MosquiShield</span></div></th>
+          </tr>
+        </thead>
+        <tbody id="comparisonBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FAQ ─── -->
+<section id="faq" class="section-pad" style="background:var(--night2)">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">FAQ</span>
+      <h2 class="section-title">Questions <span class="gradient-text">fréquentes</span></h2>
+      <p class="section-sub">Tout ce que vous devez savoir avant de rejoindre l'aventure MosquiShield.</p>
+    </div>
+    <div class="faq-grid" id="faqGrid"></div>
+  </div>
+</section>
+
+<!-- ─── PREORDER ─── -->
+<section id="preorder" class="section-pad">
+  <div class="preorder-glow"></div>
+  <div class="container">
+    <div class="preorder-inner reveal">
+      <span class="eyebrow">Précommande</span>
+      <h2>Soyez parmi les <span class="gradient-text">premiers protégés</span></h2>
+      <p>Rejoignez plus de 12 000 personnes déjà inscrites et bénéficiez d'avantages exclusifs réservés aux premiers membres.</p>
+      <div class="perks-grid">
+        <div class="perk-card"><div class="perk-icon">🎁</div><strong>Offre de lancement -22%</strong><span>69,90€ au lieu de 89,90€</span></div>
+        <div class="perk-card"><div class="perk-icon">⚡</div><strong>1 cartouche CO₂ offerte</strong><span>Valeur 14,90€</span></div>
+        <div class="perk-card"><div class="perk-icon">👑</div><strong>Accès prioritaire</strong><span>Livraison avant tout le monde</span></div>
+      </div>
+      <form class="email-form" id="emailForm" onsubmit="handleSubmit(event)">
+        <input type="email" class="email-input" placeholder="votre@email.fr" required id="emailInput" />
+        <button type="submit" class="btn-primary submit-btn" style="border-radius:50px;">
+          <span id="submitText">Rejoindre la liste</span>
+        </button>
+      </form>
+      <div class="success-msg" id="successMsg">
+        <div class="success-icon">✅</div>
+        <strong>Vous êtes sur la liste !</strong>
+        <p>Vérifiez votre boîte mail. Nous vous contacterons en priorité au lancement.</p>
+      </div>
+      <p class="privacy">Aucun spam. Vos données ne sont jamais partagées. Désinscription en un clic.</p>
+      <div class="social-proof">
+        <div class="avatars">
+          <div class="avatar" style="background:rgba(0,212,255,0.2);color:#00D4FF;">A</div>
+          <div class="avatar" style="background:rgba(123,47,255,0.2);color:#7B2FFF;">B</div>
+          <div class="avatar" style="background:rgba(255,140,66,0.2);color:#FF8C42;">C</div>
+          <div class="avatar" style="background:rgba(0,255,136,0.2);color:#00FF88;">D</div>
+          <div class="avatar" style="background:rgba(255,78,106,0.2);color:#FF4E6A;">E</div>
+        </div>
+        <span><strong>12 847</strong> personnes déjà inscrites</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="container footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="footer-logo">
+          <div class="nav-logo-icon">🛡️</div>
+          <span>Mosqui<span class="gradient-text">Shield</span></span>
+        </a>
+        <p>La startup qui réinvente la protection contre les moustiques. Paris, France 🇫🇷</p>
+        <div class="social-links">
+          <a href="#" class="social-link">𝕏</a>
+          <a href="#" class="social-link">in</a>
+          <a href="#" class="social-link">📸</a>
+          <a href="#" class="social-link">♪</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Produit</h4>
+        <ul>
+          <li><a href="#features">Fonctionnalités</a></li>
+          <li><a href="#solution">Comment ça marche</a></li>
+          <li><a href="#app">Application mobile</a></li>
+          <li><a href="#preorder">Précommande</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Entreprise</h4>
+        <ul>
+          <li><a href="#">À propos</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Presse</a></li>
+          <li><a href="#">Carrières</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Livraison</a></li>
+          <li><a href="#">Garantie</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Légal</h4>
+        <ul>
+          <li><a href="#">CGV</a></li>
+          <li><a href="#">Confidentialité</a></li>
+          <li><a href="#">Mentions légales</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 MosquiShield SAS — Tous droits réservés</span>
+      <span>Fait avec ❤️ à Paris</span>
+      <span>contact@mosquishield.fr</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── Navbar scroll ──
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40)
+  })
+
+  // ── Mobile menu ──
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open')
+  }
+  function closeMenu() {
+    document.getElementById('mobileMenu').classList.remove('open')
+  }
+
+  // ── Scroll reveal ──
+  const reveals = document.querySelectorAll('.reveal')
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), (parseFloat(e.target.style.getPropertyValue('--delay')) || 0) * 1000)
+        observer.unobserve(e.target)
+      }
+    })
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' })
+  reveals.forEach(el => observer.observe(el))
+
+  // ── Chart bars ──
+  const heights = [20,45,30,80,95,60,40,70,85,55,30,15]
+  const chartEl = document.getElementById('chartBars')
+  heights.forEach((h, i) => {
+    const bar = document.createElement('div')
+    bar.className = 'chart-bar'
+    bar.style.height = h + '%'
+    bar.style.background = (i === 4 || i === 8)
+      ? 'linear-gradient(180deg,#00D4FF 0%,#7B2FFF 100%)'
+      : 'rgba(0,212,255,0.18)'
+    chartEl.appendChild(bar)
+  })
+
+  // ── Comparison table ──
+  const criteria = [
+    'Sans produits chimiques','Efficacité prouvée','Silencieux (0 dB)',
+    'Application mobile','Respectueux de la santé','Design élégant',
+    'Statistiques d\'utilisation','Batterie rechargeable','Portée 10 m²','Zéro entretien quotidien'
+  ]
+  const compData = [
+    [false,false,false,false,false,false,false,false,false,false],
+    [false,true,true,false,false,true,false,false,false,true],
+    [true,false,false,false,true,false,false,false,false,false],
+    [true,true,true,true,true,true,true,true,true,true],
+  ]
+  const tbody = document.getElementById('comparisonBody')
+  criteria.forEach((c, ci) => {
+    const tr = document.createElement('tr')
+    tr.innerHTML = `<td>${c}</td>` + compData.map(col =>
+      `<td>${col[ci] ? '<span class="check">✓</span>' : '<span class="cross">✗</span>'}</td>`
+    ).join('')
+    tbody.appendChild(tr)
+  })
+
+  // ── FAQ ──
+  const faqs = [
+    { q: "Quelle est la portée effective de MosquiShield ?", a: "MosquiShield couvre efficacement 10 à 15 m². Pour les grandes pièces ou espaces extérieurs, nous recommandons plusieurs unités. La portée d'attraction du CO₂ peut atteindre jusqu'à 10 mètres dans des conditions idéales." },
+    { q: "La grille est-elle dangereuse pour enfants et animaux ?", a: "Absolument pas. La grille est protégée par une double cage rendant tout contact impossible. Le système est certifié CE selon les normes européennes les plus strictes. Utilisable en toute sécurité en présence d'enfants et d'animaux." },
+    { q: "Combien de temps dure une cartouche de CO₂ ?", a: "Chaque cartouche assure environ 90 jours d'autonomie en utilisation normale (8h/nuit). Un indicateur dans l'application vous avertit quand le niveau est faible. Les cartouches sont disponibles à l'unité ou en pack." },
+    { q: "Fonctionne-t-il contre le moustique tigre ?", a: "Oui ! L'attraction par CO₂ et chaleur est efficace sur toutes les espèces, y compris le moustique tigre (Aedes albopictus). Nos tests en laboratoire ont démontré un taux de capture de 99,7% pour les espèces communes en Europe." },
+    { q: "Peut-on l'utiliser à l'extérieur ?", a: "MosquiShield est certifié IP44, résistant aux éclaboussures. Il peut être utilisé sur terrasse ou balcon. Nous déconseillons de le laisser exposé à la pluie directe ou en conditions de vent fort." },
+    { q: "Quelle est l'autonomie de la batterie ?", a: "La batterie Li-ion 5000 mAh offre jusqu'à 72h d'autonomie continue. La recharge s'effectue via USB-C (câble fourni) et atteint 100% en 2h30 avec un chargeur 18W. Un indicateur LED à 4 niveaux indique l'état de charge." },
+    { q: "Dois-je nettoyer MosquiShield régulièrement ?", a: "L'entretien est minimal. La chambre de capture se vide en quelques secondes grâce au système d'ouverture magnétique. Un coup de brosse sur la grille tous les 2 à 4 semaines suffit. Aucun produit chimique nécessaire." },
+    { q: "L'application est-elle disponible sur iOS et Android ?", a: "Oui, l'application est disponible gratuitement sur l'App Store (iOS 14+) et Google Play (Android 8+). Elle se connecte via Bluetooth 5.0. Une prochaine mise à jour ajoutera une connexion Wi-Fi pour un contrôle à distance." },
+    { q: "Quand sera disponible MosquiShield et quel est le prix ?", a: "MosquiShield sera disponible au printemps 2025 à 89,90€. Les membres de la liste d'attente bénéficient d'une offre de lancement à 69,90€ (-22%) et d'une cartouche CO₂ offerte. Inscrivez-vous maintenant !" },
+    { q: "MosquiShield émet-il du bruit ou de la lumière ?", a: "Non. Le micro-ventilateur génère moins de 25 dB. Aucune lumière UV n'est émise — notre technologie repose uniquement sur le CO₂ et la chaleur. La LED indicateur peut être désactivée depuis l'application." },
+  ]
+  const faqGrid = document.getElementById('faqGrid')
+  faqs.forEach((f, i) => {
+    const div = document.createElement('div')
+    div.className = 'faq-item reveal'
+    div.innerHTML = `
+      <button class="faq-question" onclick="toggleFaq(this)">
+        <span>${f.q}</span>
+        <div class="faq-icon">+</div>
+      </button>
+      <div class="faq-answer"><p>${f.a}</p></div>`
+    faqGrid.appendChild(div)
+  })
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item')
+    item.classList.toggle('open')
+  }
+
+  // ── Email form ──
+  function handleSubmit(e) {
+    e.preventDefault()
+    const btn = document.querySelector('.submit-btn')
+    document.getElementById('submitText').textContent = 'Inscription...'
+    btn.disabled = true
+    setTimeout(() => {
+      document.getElementById('emailForm').style.display = 'none'
+      document.getElementById('successMsg').style.display = 'flex'
+    }, 900)
+  }
+</script>
+</body>
+</html>
